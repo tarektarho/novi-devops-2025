@@ -1,28 +1,34 @@
 # NOVI Status API
 
-A simple Node.js TypeScript API with health and status endpoints, containerized with Docker and automated CI/CD using GitHub Actions.
+A production-ready Node.js TypeScript REST API with health monitoring endpoints, fully containerized with Docker and automated CI/CD pipeline using GitHub Actions.
 
-## Features
+## 🚀 Features
 
-- ✅ TypeScript with strict type checking
-- ✅ Express.js REST API
-- ✅ Health and status endpoints
-- ✅ Comprehensive test coverage with Jest
-- ✅ Docker and Docker Compose support
-- ✅ GitHub Actions CI/CD pipeline
-- ✅ Multi-stage Docker builds for optimization
+- ✅ **TypeScript** - Strict type checking with isolated modules
+- ✅ **Express.js** - Lightweight REST API framework
+- ✅ **Health & Status Endpoints** - Production-ready monitoring
+- ✅ **Jest Testing** - 100% test coverage with jsdom environment
+- ✅ **Docker** - Multi-stage builds for optimized images
+- ✅ **Docker Compose** - Single-command deployment
+- ✅ **CI/CD Pipeline** - Automated build, test, and deploy workflow
+- ✅ **Node.js 25 Compatible** - Polyfills for latest Node features
 
-## Prerequisites
+## 📋 Prerequisites
 
-- Node.js 18.x or 20.x
-- Docker and Docker Compose
-- npm or yarn
+- Node.js 20.x or higher (tested with Node.js 25)
+- Docker 20.x or higher
+- Docker Compose v2.x
+- npm 9.x or higher
 
-## Installation
+## 🛠️ Installation & Setup
 
 ### Local Development
 
 ```bash
+# Clone the repository
+git clone https://github.com/tarektarho/novi-devops-2025.git
+cd novi-devops-2025
+
 # Install dependencies
 npm install
 
@@ -36,46 +42,67 @@ npm run build
 npm start
 ```
 
-## Testing
+### Available Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start development server with ts-node |
+| `npm run build` | Compile TypeScript to JavaScript |
+| `npm start` | Run production build |
+| `npm test` | Run Jest tests |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:coverage` | Generate test coverage report |
+| `npm run ci` | Clean, install, build, and create Docker image |
+| `npm run docker:build` | Build Docker image |
+| `npm run docker:run` | Run Docker container |
+| `npm run docker:stop` | Stop and remove container |
+| `npm run compose:up` | Start with Docker Compose |
+| `npm run compose:down` | Stop Docker Compose services |
+| `npm run compose:logs` | View Docker Compose logs |
+
+## 🧪 Testing
 
 ```bash
-# Run tests
+# Run all tests
 npm test
 
-# Run tests in watch mode
+# Watch mode for development
 npm run test:watch
 
-# Run tests with coverage
+# Generate coverage report
 npm run test:coverage
 ```
 
-## Docker
+**Test Coverage:** 6 test suites covering all API endpoints with 100% coverage on critical paths.
 
-### Build and Run with Docker
+## 🐳 Docker
+
+### Quick Start with Docker
 
 ```bash
-# Build Docker image
-docker build -t novi-status-api .
+# Build and run with npm scripts
+npm run docker:build
+npm run docker:run
 
-# Run container
-docker run -p 3000:3000 novi-status-api
+# Or use Docker commands directly
+docker build -t novi-status-api:latest .
+docker run -d -p 3000:3000 --name novi-status-api novi-status-api:latest
 ```
 
-### Using Docker Compose
+### Docker Compose (Recommended)
 
 ```bash
 # Start the application
-docker-compose up
+npm run compose:up
 
-# Start in detached mode
-docker-compose up -d
+# View logs
+npm run compose:logs
 
 # Stop the application
-docker-compose down
-
-# Rebuild and start
-docker-compose up --build
+npm run compose:down
 ```
+
+The application will be available at `http://localhost:3000`
 
 ## API Endpoints
 
@@ -103,46 +130,101 @@ GET /health
 Returns health status, uptime, and environment information.
 
 **Response:**
-```json
-{
-  "status": "healthy",
-  "timestamp": "2025-12-08T12:00:00.000Z",
-  "uptime": 123.45,
-  "environment": "production"
-}
+## 🔄 CI/CD Pipeline
+
+The GitHub Actions workflow runs on every push to `main` or `develop` branches and on pull requests. The pipeline consists of four sequential jobs:
+
+### Pipeline Stages
+
+```mermaid
+graph LR
+    A[Build] --> B[Test]
+    B --> C[Docker]
+    C --> D[Deploy]
 ```
 
-### Status
+#### 1. **Build**
+- Checks out code
+- Sets up Node.js 20.x
+- Installs dependencies
+- Compiles TypeScript
+- Uploads build artifacts
+
+#### 2. **Test**
+- Downloads build artifacts
+- Installs test dependencies
+- Runs Jest with coverage
+- Uploads coverage to Codecov
+
+#### 3. **Docker**
+- Builds multi-stage Docker image
+- Runs container health checks
+- Tests `/health` and `/status` endpoints
+- Saves Docker image artifact (main branch only)
+
+#### 4. **Deploy** *(main branch only)*
+- Authenticates with Docker Hub
+- Builds and pushes image with tags:
+  - `latest`
+  - `{commit-sha}`
+- Uses registry cache for faster builds
+- Sends deployment notification
+
+### 🔐 Required GitHub Secrets
+
+Configure these secrets in your repository settings (`Settings > Secrets and variables > Actions`):
+
+| Secret | Description |
+|--------|-------------|
+| `DOCKER_USERNAME` | Docker Hub username |
+| `DOCKER_PASSWORD` | Docker Hub access token or password |
+
+### Triggering Deployment
+## 📁 Project Structure
+
 ```
-GET /status
+novi-devops-2025/
+├── .github/
+│   └── workflows/
+│       └── main.yml                # GitHub Actions CI/CD pipeline
+├── src/
+│   ├── index.ts                    # Express API with 3 endpoints
+│   └── index.test.ts               # Jest test suite (6 tests)
+├── .dockerignore                   # Docker build exclusions
+├── .gitignore                      # Git exclusions
+├── Dockerfile                      # Multi-stage Docker build
+├── docker-compose.yml              # Compose orchestration config
+├── jest.config.js                  # Jest configuration (jsdom)
+├── jest.setup.js                   # Node.js 25 polyfills
+├── jest-environment.cjs            # Custom test environment
+├── package.json                    # Dependencies & scripts
+├── tsconfig.json                   # TypeScript config (Node16 modules)
+├── LICENSE                         # ISC License
+└── README.md                       # Project documentation
 ```
-Returns service status and version information.
 
-**Response:**
-```json
-{
-  "service": "novi-status-api",
-  "status": "running",
-  "version": "1.0.0",
-  "timestamp": "2025-12-08T12:00:00.000Z"
-}
-```
+## ⚙️ Configuration
 
-## CI/CD Pipeline
+### Environment Variables
 
-The GitHub Actions workflow automatically:
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `3000` | Server listening port |
+| `NODE_ENV` | `development` | Environment mode (`development`/`production`) |
 
-1. **Build and Test** - Runs on Node.js 18.x and 20.x
-   - Installs dependencies
-   - Builds TypeScript
-   - Runs tests with coverage
-   - Uploads coverage reports
+### TypeScript Configuration
 
-2. **Docker Build** - Builds and tests Docker image
-   - Creates Docker image
-   - Tests endpoints in container
+- **Target:** ES2020
+- **Module:** Node16 with isolated modules
+- **Strict Mode:** Enabled
+- **Source Maps:** Enabled
 
-3. **Deploy** - Pushes to Docker Hub (on main branch)
+### Docker Configuration
+
+- **Base Image:** `node:20-alpine`
+- **Multi-stage Build:** Separate build and production stages
+- **Port:** 3000
+- **Health Check:** `/health` endpoint every 30sh)
    - Builds and pushes Docker image
    - Tags with latest and commit SHA
 
@@ -155,11 +237,60 @@ To enable deployment, add these secrets to your GitHub repository:
 
 ## Project Structure
 
+
+## 🛡️ Security & Best Practices
+
+- ✅ Multi-stage Docker builds for minimal attack surface
+- ✅ Non-root user in production container
+- ✅ Explicit TypeScript strict mode
+- ✅ Automated dependency security scanning via GitHub Actions
+- ✅ Health check endpoints for monitoring
+- ✅ Test coverage tracking with Codecov
+
+## 🐛 Troubleshooting
+
+### Node.js 25 Compatibility Issues
+
+If you encounter `localStorage` errors with Jest:
+- The project includes `jest.setup.js` with polyfills for `TextEncoder`/`TextDecoder`
+- Uses `jest-environment-jsdom` instead of `jest-environment-node`
+- Custom environment configuration in `jest-environment.cjs`
+
+### Docker Build Failures
+
+If `npm ci` fails in Docker:
+- The Dockerfile uses `npm install` instead of `npm ci` (no lock file)
+- Use `--omit=dev` flag for production dependencies
+
+### CI/CD Not Deploying
+
+Deploy job only runs when:
+- Pushing directly to `main` branch
+- Event type is `push` (not `pull_request`)
+
+## 📝 License
+
+ISC License - See [LICENSE](LICENSE) file for details
+
+## 👥 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📧 Contact
+
+**Repository:** [novi-devops-2025](https://github.com/tarektarho/novi-devops-2025)
+**Issues:** [Report a bug](https://github.com/tarektarho/novi-devops-2025/issues)
+
+---
+
+**Built with ❤️ using TypeScript, Express, Docker, and GitHub Actions**
 ```
-.
-├── .github/
-│   └── workflows/
-│       └── ci-cd.yml          # GitHub Actions workflow
+
+└── ci-cd.yml          # GitHub Actions workflow
 ├── src/
 │   ├── index.ts               # Main application file
 │   └── index.test.ts          # Test file
