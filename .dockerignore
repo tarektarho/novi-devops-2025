@@ -1,0 +1,27 @@
+# Node modules
+node_modules/
+npm-debug.log*
+
+# Build output
+dist/
+
+# Testing
+coverage/
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+README.md
+LICENSE
+
+# CI/CD
+.github/
+
+# IDE
+.vscode/
+.idea/
+
+# Environment
+.env*
