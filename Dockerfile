@@ -1,17 +1,4 @@
 # =============================================================================
-# DOCKERFILE BEST PRACTICES APPLIED:
-# =============================================================================
-# ✅ Multi-stage builds for smaller final image
-# ✅ Specific version tags (no 'latest')
-# ✅ Non-root user for security
-# ✅ Layer caching optimization (package.json before source)
-# ✅ Production-only dependencies in final image
-# ✅ Health checks for container orchestration
-# ✅ .dockerignore to exclude unnecessary files
-# ✅ Minimal base image (Alpine Linux)
-# =============================================================================
-
-# =============================================================================
 # STAGE 1: BUILD
 # =============================================================================
 # Purpose: Compile TypeScript and prepare production artifacts
@@ -77,11 +64,11 @@ EXPOSE 3000
 # Set production environment
 ENV NODE_ENV=production
 
-# Health check for container orchestration
-# Docker/Kubernetes can automatically restart unhealthy containers
-# Use PORT env var or fallback to 3000
+# Health check for local Docker/Kubernetes deployments only
+# Note: Render and some cloud platforms provide their own health checks
+# This uses sh -c to properly expand the PORT environment variable
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3000}/health || exit 1
+    CMD sh -c 'wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3000}/health || exit 1'
 
 # Use dumb-init as PID 1 to handle signals properly
 # This ensures graceful shutdowns and prevents zombie processes
