@@ -37,7 +37,7 @@ export class HealthController extends BaseController {
     this.requestCount++;
 
     return this.ok(res, {
-      app: 'DevOps Demo',
+      app: 'Items Management Service',
       version: this.config.get('appVersion'),
       node_version: process.version,
       platform: process.platform,
