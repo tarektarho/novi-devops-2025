@@ -71,6 +71,7 @@ RUN chown -R nodejs:nodejs /app
 USER nodejs
 
 # Document exposed port (informational)
+# Note: Actual port is set via PORT environment variable (Render uses 10000)
 EXPOSE 3000
 
 # Set production environment
@@ -78,8 +79,9 @@ ENV NODE_ENV=production
 
 # Health check for container orchestration
 # Docker/Kubernetes can automatically restart unhealthy containers
+# Use PORT env var or fallback to 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3000}/health || exit 1
 
 # Use dumb-init as PID 1 to handle signals properly
 # This ensures graceful shutdowns and prevents zombie processes
