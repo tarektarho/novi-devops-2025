@@ -48,7 +48,8 @@ services:
       - key: BUILD_TIME
         sync: false
 
-    buildCommand: echo "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> .env
+    # Docker builds don't use buildCommand - it's handled by Dockerfile
+    # buildCommand: echo "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> .env
     numInstances: 1
 
   # =============================================================================
@@ -94,9 +95,8 @@ services:
       - key: BUILD_TIME
         sync: false                     # Don't sync from dashboard (set during build)
 
-    # Build Command (runs before starting the container)
-    # Useful for setting dynamic environment variables
-    buildCommand: echo "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> .env
+    # Docker builds don't use buildCommand - the build is handled by Dockerfile
+    # buildCommand: echo "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> .env
 
     # Number of instances (free plan = 1)
     numInstances: 1
