@@ -4,6 +4,12 @@
 # Purpose: Compile TypeScript and prepare production artifacts
 FROM node:22-alpine AS builder
 
+# Add build argument for cache busting
+ARG BUILD_DATE
+ARG VCS_REF
+LABEL build_date=$BUILD_DATE
+LABEL vcs_ref=$VCS_REF
+
 # Set working directory
 WORKDIR /app
 
