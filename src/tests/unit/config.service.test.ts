@@ -154,7 +154,7 @@ describe('ConfigService', () => {
       const isProductionLike = configService.isProductionLike();
       const isProduction = configService.isProduction();
       const isStaging = configService.isStaging();
-      
+
       expect(isProductionLike).toBe(isProduction || isStaging);
     });
 
