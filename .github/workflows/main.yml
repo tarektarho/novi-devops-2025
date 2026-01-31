@@ -167,8 +167,7 @@ jobs:
     permissions:
       contents: read # Read repository contents
       packages: write # Write to GitHub Packages
-      attestations: write # Generate SBOM attestations
-      id-token: write # Required for SBOM signing
+      id-token: write # Required for provenance and SBOM signing
 
     # Export image tag for use in downstream jobs
     outputs:
@@ -212,20 +211,12 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha # Restore cache from GitHub Actions cache
           cache-to: type=gha,mode=max # Save all layers to cache
-          # Security: Build provenance for supply chain verification
+          # Security: Build provenance and SBOM for supply chain verification
+          # These are automatically attached to the image manifest
           provenance: true
-          sbom: true # Generate Software Bill of Materials
-
-      # Generate attestation for supply chain security (GitHub feature)
-      # This creates a verifiable record of what was built and by whom
-      - name: Generate SBOM attestation
-        if: github.event_name == 'push'
-        uses: actions/attest-sbom@v1
-        with:
-          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          subject-digest: ${{ steps.build.outputs.digest }}
-          sbom-path: "sbom.spdx.json"
-          push-to-registry: true
+          sbom: true # Generate Software Bill of Materials (SPDX format)
+          # SBOM and provenance attestations are automatically pushed to the registry
+          # View them at: ghcr.io with `docker buildx imagetools inspect`
 
   # ===========================================
   # CONTAINER SECURITY SCAN
