@@ -2,7 +2,7 @@
  * Tests for InMemoryItemsRepository
  */
 
-import { InMemoryItemsRepository, Item } from '../database';
+import { InMemoryItemsRepository } from '../database';
 
 describe('InMemoryItemsRepository', () => {
   let repository: InMemoryItemsRepository;

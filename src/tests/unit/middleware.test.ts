@@ -319,7 +319,7 @@ describe('Middleware', () => {
       const paths = ['/', '/health', '/api/items', '/api/items/1'];
 
       paths.forEach(path => {
-        //@ts-ignore
+        //@ts-expect-error - Testing with mock path assignment
         mockRequest.path = path;
         requestLogger.handle(
           mockRequest as Request,

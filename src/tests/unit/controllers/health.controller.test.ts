@@ -140,7 +140,7 @@ describe('HealthController', () => {
 
     it('should increment request count', () => {
       controller.info(mockRequest as Request, mockResponse as Response);
-      const response1 = (mockResponse.json as jest.Mock).mock.calls[0][0];
+      const _response1 = (mockResponse.json as jest.Mock).mock.calls[0][0];
 
       controller.info(mockRequest as Request, mockResponse as Response);
       const response2 = (mockResponse.json as jest.Mock).mock.calls[1][0];

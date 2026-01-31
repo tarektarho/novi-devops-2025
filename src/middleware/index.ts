@@ -42,7 +42,7 @@ export class MetricsMiddleware extends BaseMiddleware {
  * Centralized error handling
  */
 export class ErrorHandlerMiddleware {
-  public handle(err: Error, req: Request, res: Response, next: NextFunction): void {
+  public handle(err: Error, req: Request, res: Response, _next: NextFunction): void {
     console.error('Error:', err.stack);
 
     res.status(500).json({

@@ -4,7 +4,7 @@
 
 import { Request, Response } from 'express';
 import { ItemsController } from '../../../controllers/items.controller';
-import { InMemoryItemsRepository } from '../../../database';
+import { InMemoryItemsRepository, Item } from '../../../database';
 
 describe('ItemsController', () => {
   let controller: ItemsController;
@@ -43,7 +43,7 @@ describe('ItemsController', () => {
       controller.getAll(mockRequest as Request, mockResponse as Response);
 
       const items = (mockResponse.json as jest.Mock).mock.calls[0][0];
-      items.forEach((item: any) => {
+      items.forEach((item: Item) => {
         expect(item).toHaveProperty('id');
         expect(item).toHaveProperty('name');
         expect(item).toHaveProperty('description');

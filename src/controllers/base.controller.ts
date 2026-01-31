@@ -3,7 +3,7 @@
  * Abstract class providing common controller functionality
  */
 
-import { Request, Response } from 'express';
+import { Response } from 'express';
 
 export abstract class BaseController {
   /**
