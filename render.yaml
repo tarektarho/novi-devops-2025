@@ -43,7 +43,7 @@ services:
         value: staging                  # Staging environment
 
       - key: APP_VERSION
-        value: 1.0.0-staging
+        value: 1.0.1-staging
 
       - key: BUILD_TIME
         sync: false
