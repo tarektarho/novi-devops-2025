@@ -1,3 +1,5 @@
+import packageJson from '../../package.json';
+
 /**
  * Application configuration
  * Centralized configuration management following Single Responsibility Principle
@@ -19,7 +21,7 @@ export class ConfigService {
     this.config = {
       port: parseInt(process.env.PORT || '3000', 10),
       nodeEnv: (process.env.NODE_ENV as Environment) || 'development',
-      appVersion: process.env.APP_VERSION || '1.0.0'
+      appVersion: process.env.APP_VERSION || packageJson.version
     };
   }
 

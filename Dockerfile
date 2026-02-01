@@ -70,11 +70,11 @@ EXPOSE 3000
 # Set production environment
 ENV NODE_ENV=production
 
-# Health check for local Docker/Kubernetes deployments only
-# Note: Render and some cloud platforms provide their own health checks
-# This uses sh -c to properly expand the PORT environment variable
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD sh -c 'wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3000}/health || exit 1'
+# Note: Docker HEALTHCHECK is disabled for cloud platforms like Render
+# Cloud platforms provide their own health checking mechanisms (healthCheckPath in render.yaml)
+# Uncomment below for local Docker/Kubernetes deployments:
+# HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+#     CMD sh -c 'wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3000}/health || exit 1'
 
 # Use dumb-init as PID 1 to handle signals properly
 # This ensures graceful shutdowns and prevents zombie processes

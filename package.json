@@ -1,6 +1,6 @@
 {
     "name": "novi-devops-2025",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Simple Node.js TypeScript API with status endpoint",
     "main": "dist/index.js",
     "scripts": {

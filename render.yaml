@@ -42,9 +42,6 @@ services:
       - key: NODE_ENV
         value: staging                  # Staging environment
 
-      - key: APP_VERSION
-        value: 1.0.1-staging
-
       - key: BUILD_TIME
         sync: false
 
@@ -85,9 +82,6 @@ services:
       # PORT is automatically set by Render (usually 10000)
       # Your app MUST listen on process.env.PORT
 
-      # Application Version
-      - key: APP_VERSION
-        value: 1.0.0                    # Matches docker-compose version
 
       # Build Timestamp (set at deploy time)
       # NOTE: DEPLOYED_AT should be set via build command, not generateValue

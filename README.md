@@ -384,8 +384,8 @@ See [.github/workflows/main.yml](.github/workflows/main.yml) for complete workfl
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `PORT` | `3000` | Server listening port |
-| `NODE_ENV` | `development` | Environment mode (`development`/`production`/`test`) |
-| `APP_VERSION` | `1.0.0` | Application version from package.json |
+| `NODE_ENV` | `development` | Environment mode (`development`/`staging`/`production`/`test`) |
+| `APP_VERSION` | Auto-detected | Application version (automatically read from package.json) |
 
 ### TypeScript Configuration
 
