@@ -751,7 +751,23 @@
                     "color": {
                         "mode": "thresholds"
                     },
-                    "mappings": [],
+                    "mappings": [
+                        {
+                            "options": {
+                                "0": {
+                                    "color": "red",
+                                    "index": 1,
+                                    "text": "Down :( "
+                                },
+                                "1": {
+                                    "color": "green",
+                                    "index": 0,
+                                    "text": "Up!"
+                                }
+                            },
+                            "type": "value"
+                        }
+                    ],
                     "thresholds": {
                         "mode": "absolute",
                         "steps": [
@@ -760,26 +776,21 @@
                                 "value": null
                             },
                             {
-                                "color": "yellow",
-                                "value": 5
-                            },
-                            {
                                 "color": "red",
-                                "value": 10
+                                "value": 80
                             }
                         ]
-                    },
-                    "unit": "short"
+                    }
                 },
                 "overrides": []
             },
             "gridPos": {
                 "h": 6,
-                "w": 6,
+                "w": 12,
                 "x": 0,
                 "y": 24
             },
-            "id": 8,
+            "id": 11,
             "options": {
                 "colorMode": "value",
                 "graphMode": "area",
@@ -801,11 +812,15 @@
                         "type": "prometheus",
                         "uid": "prometheus"
                     },
-                    "expr": "nodejs_active_handles_total",
+                    "editorMode": "code",
+                    "expr": "up{job=\"novi-devops-2025-app\"}",
+                    "instant": false,
+                    "legendFormat": "__auto",
+                    "range": true,
                     "refId": "A"
                 }
             ],
-            "title": "Active Handles",
+            "title": "Application Status",
             "type": "stat"
         },
         {
@@ -843,7 +858,7 @@
             "gridPos": {
                 "h": 6,
                 "w": 6,
-                "x": 6,
+                "x": 12,
                 "y": 24
             },
             "id": 9,
@@ -874,6 +889,73 @@
             ],
             "title": "Active Resources",
             "type": "stat"
+        },
+        {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "yellow",
+                                "value": 5
+                            },
+                            {
+                                "color": "red",
+                                "value": 10
+                            }
+                        ]
+                    },
+                    "unit": "short"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 6,
+                "x": 18,
+                "y": 24
+            },
+            "id": 8,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "pluginVersion": "10.2.0",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "expr": "nodejs_active_handles_total",
+                    "refId": "A"
+                }
+            ],
+            "title": "Active Handles",
+            "type": "stat"
         }
     ],
     "refresh": "5s",
@@ -894,6 +976,6 @@
     "timezone": "",
     "title": "NOVI DevOps 2025 - Advanced Application Monitoring",
     "uid": "novi-advanced-monitoring",
-    "version": 2,
+    "version": 3,
     "weekStart": ""
 }
