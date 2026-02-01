@@ -253,7 +253,8 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          # Use short SHA tag format (e.g., abc1234) that matches what metadata-action creates
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
           format: "sarif" # Output in SARIF format for GitHub
           output: "trivy-results.sarif"
           severity: "CRITICAL,HIGH" # Only report critical and high severity issues
@@ -262,7 +263,7 @@ jobs:
       # Upload scan results to GitHub Security tab
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@v4
-        if: always() # Upload even if scan found issues
+        if: always() && hashFiles('trivy-results.sarif') != '' # Only upload if file exists
         with:
           sarif_file: "trivy-results.sarif"
         continue-on-error: true
