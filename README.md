@@ -595,6 +595,16 @@ Built with modern tools and best practices:
 - **Docker** - Containerization platform
 - **GitHub Actions** - CI/CD automation
 
+## 📝 TODO
+
+Future improvements and enhancements:
+
+- [ ] **Code Coverage Integration** - Connect Codecov to upload and visualize test coverage reports
+- [ ] **Database Integration** - Replace in-memory repository with PostgreSQL/MongoDB
+- [ ] **API Documentation** - Add Swagger/OpenAPI documentation
+- [ ] **Rate Limiting** - Implement API rate limiting and throttling
+- [ ] **Authentication** - Add JWT-based authentication system
+
 ---
 
 **Built with ❤️ using TypeScript, Express, Docker, and GitHub Actions**
