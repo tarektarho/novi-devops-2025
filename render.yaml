@@ -33,6 +33,10 @@ services:
     # Docker Configuration
     dockerfilePath: ./Dockerfile
     dockerContext: ./
+    
+    # Docker build arguments for cache busting
+    # CACHEBUST with timestamp ensures fresh builds on every deployment
+    dockerCommand: docker build --build-arg CACHEBUST=$(date +%s) --build-arg VCS_REF=$RENDER_GIT_COMMIT -t $RENDER_SERVICE_NAME .
 
     # Health Check
     healthCheckPath: /health
@@ -68,6 +72,10 @@ services:
     # Docker Configuration
     dockerfilePath: ./Dockerfile        # Path to Dockerfile (default: ./Dockerfile)
     dockerContext: ./                   # Build context (default: repository root)
+    
+    # Docker build arguments for cache busting
+    # CACHEBUST with timestamp ensures fresh builds on every deployment
+    dockerCommand: docker build --build-arg CACHEBUST=$(date +%s) --build-arg VCS_REF=$RENDER_GIT_COMMIT -t $RENDER_SERVICE_NAME .
 
     # Health Check Configuration
     # Render uses this to determine if service is healthy
