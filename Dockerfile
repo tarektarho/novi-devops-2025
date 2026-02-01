@@ -4,11 +4,6 @@
 # Purpose: Compile TypeScript and prepare production artifacts
 FROM node:22-alpine AS builder
 
-# Add build argument for cache busting
-ARG BUILD_DATE
-ARG VCS_REF
-ARG CACHEBUST=1
-
 # Set working directory
 WORKDIR /app
 
@@ -19,10 +14,6 @@ COPY package*.json ./
 # Install ALL dependencies (including devDependencies for build)
 # Use npm ci for faster, more reliable installs in CI/CD
 RUN npm ci --only=production=false
-
-# Invalidate cache for source code changes
-# This ensures fresh builds on every deployment
-RUN echo "Cache bust: $CACHEBUST"
 
 # Copy application source code
 # This happens AFTER npm install to leverage Docker layer caching
@@ -37,12 +28,9 @@ RUN npm run build
 # Purpose: Create minimal runtime image with only production dependencies
 FROM node:22-alpine
 
-# Add build metadata labels
-ARG BUILD_DATE
-ARG VCS_REF
-LABEL org.opencontainers.image.created=$BUILD_DATE
-LABEL org.opencontainers.image.revision=$VCS_REF
+# Add build metadata for tracking
 LABEL org.opencontainers.image.source="https://github.com/tarektarho/novi-devops-2025"
+LABEL org.opencontainers.image.description="NOVI DevOps 2025 - Items Management Service"
 
 # Install dumb-init to handle PID 1 responsibilities properly
 # Ensures proper signal handling and zombie process reaping
