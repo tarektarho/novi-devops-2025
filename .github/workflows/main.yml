@@ -7,19 +7,21 @@
 name: CI/CD Pipeline
 
 # Trigger conditions:
-# - Push to main or develop branches
+# - Push to main or develop branches (only when not in a PR)
 # - Pull requests targeting main branch
 on:
   push:
     branches: [main, develop]
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened]
 
 # Concurrency control: Cancel outdated workflow runs to save CI minutes
 # Example: Push commit A (starts workflow), then push commit B
 # → Commit A's workflow is cancelled automatically
+# Groups by workflow + ref, so PR runs and push runs are separate groups
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 # Global environment variables used across all jobs
