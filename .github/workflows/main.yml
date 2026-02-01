@@ -81,8 +81,8 @@ jobs:
         run: npm ci
 
       # Run Jest test suite with coverage
-      - name: Run tests
-        run: npm test
+      - name: Run tests with coverage
+        run: npm run test:coverage
 
       # Upload test coverage report as artifact (available even if tests fail)
       - name: Upload coverage
@@ -91,6 +91,7 @@ jobs:
         with:
           name: coverage-report
           path: coverage/
+          if-no-files-found: warn # Warn but don't fail if coverage is missing
 
   security-audit:
     name: Security Audit
