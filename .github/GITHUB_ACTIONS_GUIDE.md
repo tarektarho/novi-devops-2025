@@ -1,18 +1,18 @@
 # GitHub Actions CI/CD - Setup Guide
 
-## 🎯 Overview
+## Overview
 
-Your workflow now implements **industry-standard CI/CD**:
+The workflow includes:
 
-✅ **Concurrency Control** - Cancels outdated runs automatically
-✅ **Job Timeouts** - Prevents runaway jobs (saves money)
-✅ **Dependency Review** - Blocks malicious packages in PRs
-✅ **SBOM Generation** - Software Bill of Materials for security
-✅ **Minimal Permissions** - Least privilege principle
-✅ **Parallel Execution** - Faster CI (lint + test + audit simultaneously)
-✅ **Supply Chain Security** - Build attestations and provenance
-✅ **Smoke Tests** - Post-deployment verification
-✅ **Environment URLs** - Quick access to staging/production
+- Concurrency control (cancels outdated runs)
+- Job timeouts (prevents runaway jobs)
+- Dependency review (blocks malicious packages in PRs)
+- SBOM generation (Software Bill of Materials)
+- Minimal permissions (least privilege principle)
+- Parallel execution (lint + test + audit run simultaneously)
+- Supply chain security (build attestations and provenance)
+- Smoke tests (post-deployment verification)
+- Environment URLs (quick access to staging/production)
 
 ---
 
@@ -72,11 +72,11 @@ Your workflow now implements **industry-standard CI/CD**:
   - ☑️ **Wait timer**: 5 minutes (optional - time to cancel if needed)
   - ☑️ **Deployment branches**: Only `main` branch
 
-### Why Environments?
-- **Manual Approval**: Requires team review before production deploys
-- **Environment Secrets**: Different secrets for staging vs production
-- **Deployment History**: Track all deployments in one place
-- **Quick Access**: Click environment URL to view live site
+Benefits of using environments:
+- Manual approval for production deployments
+- Separate secrets for staging vs production
+- Centralized deployment history
+- Quick access links to live sites
 
 ---
 
@@ -103,49 +103,49 @@ main branch → Production Environment (with approval)
 
 ### Concurrency Example
 
-**Scenario:** You push 3 commits rapidly:
+If you push 3 commits rapidly:
 ```
 Commit A → Workflow starts
-Commit B → Workflow starts, Commit A cancelled ✅
-Commit C → Workflow starts, Commit B cancelled ✅
+Commit B → Workflow starts, Commit A cancelled
+Commit C → Workflow starts, Commit B cancelled
 ```
 
-**Result:** Only Commit C runs (saves ~20 CI minutes)
+Only Commit C runs (saves ~20 CI minutes)
 
 ---
 
-## 🔍 Understanding the Jobs
+## Job Details
 
-### 1️⃣ **Code Quality** (Parallel)
+### Code Quality (Parallel)
 - **lint** (10min timeout) - ESLint code quality checks
 - **test** (15min timeout) - Jest test suite + coverage
 - **security-audit** (10min timeout) - npm audit for vulnerabilities
 
-### 2️⃣ **Dependency Review** (PRs Only)
+### Dependency Review (PRs Only)
 - Scans for malicious packages
 - Comments on PR with findings
 - Fails if high/critical vulnerabilities found
 
-### 3️⃣ **Build** (20min timeout)
+### Build (20min timeout)
 - Builds Docker image
 - Pushes to GitHub Container Registry (`ghcr.io`)
 - Generates SBOM (Software Bill of Materials)
 - Creates build attestations for supply chain security
 
-### 4️⃣ **Security Scan** (15min timeout)
+### Security Scan (15min timeout)
 - Uses Trivy to scan Docker image
 - Checks for CVEs in dependencies and OS packages
 - Uploads results to GitHub Security tab
 
-### 5️⃣ **Deploy Staging** (10min timeout)
+### Deploy Staging (10min timeout)
 - Triggers on `develop` branch push
 - Calls Render deploy hook
 - Waits 30s and verifies health endpoint
 - Auto-deploys (no approval needed)
 
-### 6️⃣ **Deploy Production** (15min timeout)
+### Deploy Production (15min timeout)
 - Triggers on `main` branch push
-- **Requires manual approval** (if configured)
+- Requires manual approval (if configured)
 - Calls Render deploy hook
 - Waits 60s for Render to build
 - Runs smoke tests:
@@ -156,7 +156,7 @@ Commit C → Workflow starts, Commit B cancelled ✅
 
 ---
 
-## 🧪 Testing Your Workflow
+## Testing the Workflow
 
 ### Test Without Deploying
 
@@ -207,9 +207,9 @@ curl https://novi-devops-2025-prod.onrender.com/health
 
 ---
 
-## 💰 Cost Optimization
+## Cost Optimization
 
-Your workflow is optimized to save CI minutes:
+Optimizations in the workflow:
 
 | Feature | Savings |
 |---------|---------|
@@ -219,11 +219,11 @@ Your workflow is optimized to save CI minutes:
 | Docker layer cache | ~2min faster builds |
 | Parallel jobs | 3x faster than sequential |
 
-**Free Tier Limits:**
-- **GitHub Free**: 2,000 minutes/month
-- **GitHub Pro**: 3,000 minutes/month
+Free tier limits:
+- GitHub Free: 2,000 minutes/month
+- GitHub Pro: 3,000 minutes/month
 
-**Estimate:** With these optimizations, you can run ~100-150 full workflows/month on free tier.
+Estimate: ~100-150 full workflows/month on free tier.
 
 ---
 
@@ -285,34 +285,28 @@ on:
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
-### ❌ "Build failed - timeout"
-**Cause:** Job exceeded timeout limit
-**Solution:** Increase timeout or optimize build
+### Build timeout
+Increase timeout or optimize build:
 ```yaml
 timeout-minutes: 30  # Increase from 20
 ```
 
-### ❌ "Permission denied - packages: write"
-**Cause:** Missing permissions for GHCR push
-**Solution:** Already configured - check token hasn't expired
+### Permission denied for packages
+Check token hasn't expired (permissions already configured).
 
-### ❌ "Health check failed after deployment"
-**Cause:** App not listening on PORT env variable
-**Solution:** Verify in your code:
+### Health check failed after deployment
+Ensure app listens on `process.env.PORT`:
 ```typescript
 const PORT = process.env.PORT || 3000;
 app.listen(PORT);
 ```
 
-### ❌ "RENDER_DEPLOY_HOOK not configured"
-**Cause:** Secret not added to GitHub
-**Solution:** Follow "Required Secrets Configuration" section above
+### RENDER_DEPLOY_HOOK not configured
+Add secret to GitHub (see Required Secrets Configuration).
 
-### ❌ "Dependency review failed"
-**Cause:** PR introduces vulnerable dependencies
-**Solution:**
+### Dependency review failed
 1. Check PR comments for details
 2. Update vulnerable packages
 3. Push fix to PR branch
@@ -329,18 +323,18 @@ app.listen(PORT);
 
 ---
 
-## ✅ Checklist for Production Readiness
+## Production Readiness Checklist
 
-- [ ] Added `RENDER_DEPLOY_HOOK` secret to GitHub
-- [ ] Created `production` environment with manual approval
-- [ ] Updated Render service URLs in workflow (if different)
-- [ ] Tested workflow with a PR
-- [ ] Verified Docker image builds successfully
-- [ ] Confirmed app listens on `process.env.PORT`
-- [ ] Tested `/health` endpoint returns 200 OK
-- [ ] Reviewed security scan results
+- [ ] Add `RENDER_DEPLOY_HOOK` secret to GitHub
+- [ ] Create `production` environment with manual approval
+- [ ] Update Render service URLs in workflow (if different)
+- [ ] Test workflow with a PR
+- [ ] Verify Docker image builds successfully
+- [ ] Confirm app listens on `process.env.PORT`
+- [ ] Test `/health` endpoint returns 200 OK
+- [ ] Review security scan results
 - [ ] Set up notifications (optional)
-- [ ] Documented deployment process for team
+- [ ] Document deployment process for team
 
 ---
 

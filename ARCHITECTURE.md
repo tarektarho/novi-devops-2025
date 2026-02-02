@@ -1,6 +1,6 @@
-# Project Architecture Overview
+# Project Architecture
 
-This document describes the Object-Oriented architecture of the novi-devops-2025 application, built following SOLID principles, clean code practices, and modern design patterns.
+Object-Oriented architecture following SOLID principles, clean code practices, and modern design patterns.
 
 ## 📁 Project Structure
 

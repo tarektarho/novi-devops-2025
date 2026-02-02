@@ -1,6 +1,6 @@
 # NOVI DevOps 2025 - REST API
 
-A modern, production-ready Node.js TypeScript REST API built with Object-Oriented Programming principles, featuring comprehensive monitoring, testing, and containerization. This project demonstrates enterprise-level architecture with SOLID principles, Repository Pattern, and complete CI/CD automation.
+Node.js TypeScript REST API with Object-Oriented Programming, comprehensive monitoring, testing, and containerization. Built with SOLID principles, Repository Pattern, and CI/CD automation.
 
 ## ✨ Key Features
 
@@ -200,9 +200,9 @@ Returns Prometheus-formatted metrics including:
 - Process uptime
 - Memory usage
 - Default Node.js metrics
-## 🧪 Testing
+## Testing
 
-This project has comprehensive test coverage with **207 tests** achieving **95.85% code coverage**.
+207 tests with 95.85% code coverage.
 
 ### Running Tests
 
@@ -242,9 +242,9 @@ Routes:           100% coverage
 
 See [TESTING.md](TESTING.md) for detailed testing documentation.
 
-## 🏗️ Architecture
+## Architecture
 
-This project follows **SOLID principles** and uses modern design patterns:
+Follows SOLID principles with modern design patterns:
 
 ### Design Patterns
 - **Singleton Pattern** - ConfigService, MetricsService, InMemoryItemsRepository
@@ -286,7 +286,7 @@ src/
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed architecture documentation.
 
-## 🐳 Docker & Containerization
+## Docker & Containerization
 
 ### Multi-Stage Docker Build
 
@@ -321,9 +321,9 @@ Configuration files:
 - `docker-compose.yml` - Service orchestration
 - `prometheus/prometheus.yml` - Scrape configuration
 - `Dockerfile` - Multi-stage build definition
-## ⚙️ CI/CD Pipeline
+## CI/CD Pipeline
 
-Automated GitHub Actions workflow triggered on push to `main`/`develop` branches and pull requests.
+GitHub Actions workflow triggered on push to `main`/`develop` branches and pull requests.
 
 ### Pipeline Flow
 
@@ -358,12 +358,12 @@ Automated GitHub Actions workflow triggered on push to `main`/`develop` branches
 
 ### Pipeline Features
 
-- ✅ **Parallel Execution** - Lint, test, and security checks run simultaneously
-- ✅ **Docker Caching** - GitHub Actions cache for faster builds
-- ✅ **Security Scanning** - Trivy scans for vulnerabilities
-- ✅ **SARIF Reports** - Security findings in GitHub Security tab
-- ✅ **Branch-Based Deploy** - Automatic deployment based on branch
-- ✅ **Artifact Upload** - Test coverage and audit reports preserved
+- Parallel execution (lint, test, security checks run simultaneously)
+- Docker caching (GitHub Actions cache for faster builds)
+- Security scanning (Trivy scans for vulnerabilities)
+- SARIF reports (security findings in GitHub Security tab)
+- Branch-based deployment (automatic based on branch)
+- Artifact upload (test coverage and audit reports preserved)
 
 ### Workflow Jobs
 
@@ -404,37 +404,37 @@ See [.github/workflows/main.yml](.github/workflows/main.yml) for complete workfl
 - **Non-root User:** Runs as `node` user for security
 
 
-## 🛡️ Security & Best Practices
+## Security & Best Practices
 
 ### Security Features
 
-- ✅ **Multi-stage Docker Builds** - Minimal attack surface with production-only dependencies
-- ✅ **Non-root Container User** - Runs as unprivileged `node` user
-- ✅ **Dependency Scanning** - Automated npm audit in CI/CD pipeline
-- ✅ **Container Scanning** - Trivy vulnerability scanning for Docker images
-- ✅ **SARIF Reports** - Security findings integrated in GitHub Security tab
-- ✅ **TypeScript Strict Mode** - Compile-time safety and type checking
-- ✅ **Input Validation** - Request validation in all API endpoints
+- Multi-stage Docker builds (minimal attack surface with production-only dependencies)
+- Non-root container user (runs as unprivileged `node` user)
+- Dependency scanning (automated npm audit in CI/CD pipeline)
+- Container scanning (Trivy vulnerability scanning for Docker images)
+- SARIF reports (security findings integrated in GitHub Security tab)
+- TypeScript strict mode (compile-time safety and type checking)
+- Input validation (request validation in all API endpoints)
 
 ### Code Quality
 
-- 📊 **95.85% Test Coverage** - Comprehensive test suite
-- 🎯 **SOLID Principles** - Maintainable and extensible architecture
-- 🏗️ **Design Patterns** - Industry-standard patterns for common problems
-- 📝 **TypeScript** - Full type safety with strict mode
-- 🔍 **ESLint** - Automated code quality checks
-- 📚 **Documentation** - Comprehensive docs in ARCHITECTURE.md and TESTING.md
+- 95.85% test coverage (comprehensive test suite)
+- SOLID principles (maintainable and extensible architecture)
+- Design patterns (industry-standard patterns)
+- TypeScript (full type safety with strict mode)
+- ESLint (automated code quality checks)
+- Documentation (comprehensive docs in ARCHITECTURE.md and TESTING.md)
 
 ### Production Readiness
 
-- ❤️ **Health Checks** - Docker health check and dedicated `/health` endpoint
-- 📊 **Metrics** - Prometheus metrics for monitoring
-- 📈 **Observability** - Grafana dashboards for visualization
-- 🔄 **Graceful Shutdown** - Proper cleanup on SIGTERM/SIGINT
-- 🚨 **Error Handling** - Centralized error handling middleware
-- 📝 **Structured Logging** - Request logging in development mode
+- Health checks (Docker health check and `/health` endpoint)
+- Metrics (Prometheus metrics for monitoring)
+- Observability (Grafana dashboards for visualization)
+- Graceful shutdown (proper cleanup on SIGTERM/SIGINT)
+- Error handling (centralized error handling middleware)
+- Structured logging (request logging in development mode)
 
-## 📊 Monitoring & Observability
+## Monitoring & Observability
 
 ### Prometheus Metrics
 
@@ -461,7 +461,7 @@ Pre-configured to visualize:
 - System resource usage
 - API endpoint performance
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 

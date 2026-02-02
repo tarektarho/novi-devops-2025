@@ -1,8 +1,8 @@
-# 📬 Postman API Testing Guide
+# Postman API Testing Guide
 
-Complete Postman collection for testing the NOVI DevOps 2025 API endpoints across all environments.
+Postman collection for testing NOVI DevOps 2025 API endpoints across all environments.
 
-## 📦 Files Included
+## Files Included
 
 - **`postman_collection.json`** - Complete API collection with all endpoints
 - **`postman_environment_local.json`** - Local development environment (localhost:3000)
@@ -11,7 +11,7 @@ Complete Postman collection for testing the NOVI DevOps 2025 API endpoints acros
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Import Collection into Postman
 
@@ -48,7 +48,7 @@ In Postman's top-right corner:
 
 ---
 
-## 📋 Available Endpoints
+## Available Endpoints
 
 ### Health & Info
 - **GET /** - Welcome message and endpoint list
@@ -67,7 +67,7 @@ In Postman's top-right corner:
 
 ---
 
-## 🧪 Testing Workflow
+## Testing Workflow
 
 ### 1. Test Health Endpoints First
 
@@ -123,7 +123,7 @@ Verify error handling:
 
 ---
 
-## 🔧 Environment Variables
+## Environment Variables
 
 Each environment uses a `baseUrl` variable:
 
@@ -141,7 +141,7 @@ Each environment uses a `baseUrl` variable:
 
 ---
 
-## 📊 Example Request Bodies
+## Example Request Bodies
 
 ### Create Item
 ```json

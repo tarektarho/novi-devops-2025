@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the comprehensive testing approach for the novi-devops-2025 application. The test suite consists of 207 total tests with **95.81% overall code coverage**.
+Testing approach for novi-devops-2025. The test suite has 207 tests with 95.81% code coverage.
 
 ## Test Structure
 
