@@ -7,11 +7,11 @@
 name: CI/CD Pipeline
 
 # Trigger conditions:
-# - Push to main branch only (direct commits)
+# - Push to main or develop branches (direct commits)
 # - Pull requests targeting main (includes develop → main)
 on:
   push:
-    branches: [main] # Only run on direct pushes to main
+    branches: [main, develop] # Run on pushes to main and develop
   pull_request:
     branches: [main] # Run on PRs to main (covers develop branch changes)
     types: [opened, synchronize, reopened]
