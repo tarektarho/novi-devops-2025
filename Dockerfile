@@ -68,11 +68,10 @@ EXPOSE 3000
 # Set production environment
 ENV NODE_ENV=production
 
-# Note: Docker HEALTHCHECK is disabled for cloud platforms like Render
-# Cloud platforms provide their own health checking mechanisms (healthCheckPath in render.yaml)
-# Uncomment below for local Docker/Kubernetes deployments:
-# HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-#     CMD sh -c 'wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3000}/health || exit 1'
+# Health check - verifies container is running and responsive
+# Checks /health endpoint every 30s, waits 5s on startup before first check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD sh -c 'wget --no-verbose --tries=1 --spider http://localhost:${PORT:-3000}/health || exit 1'
 
 # Use dumb-init as PID 1 to handle signals properly
 # This ensures graceful shutdowns and prevents zombie processes
