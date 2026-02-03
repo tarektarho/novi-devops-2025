@@ -1,20 +1,149 @@
-version: "3.8"
+# =============================================================================
+# NOVI DevOps 2025 - Monitoring Stack with Docker Compose
+# =============================================================================
+# This compose file sets up a complete monitoring stack:
+# - Node.js API application (port 3000)
+# - Prometheus for metrics collection (port 9090)
+# - Grafana for visualization and dashboards (port 3001)
+#
+# Quick Start:
+#   docker-compose up -d       # Start all services
+#   docker-compose logs -f     # View logs
+#   docker-compose down        # Stop all services
+# =============================================================================
 
 services:
-  api:
+  # =============================================================================
+  # APPLICATION SERVICE
+  # =============================================================================
+  # Node.js TypeScript API with health checks and Prometheus metrics
+  app:
+    # Build from local Dockerfile (multi-stage build for optimization)
     build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: novi-status-api
+      context: . # Build context is project root
+      dockerfile: Dockerfile # Use multi-stage Dockerfile
+
+    container_name: novi-devops-2025-app
+
+    # Expose API on port 3000
     ports:
-      - "3000:3000"
+      - "3000:3000" # host:container mapping
+
+    # Application environment variables (loaded from .env file)
     environment:
-      - NODE_ENV=production
-      - PORT=3000
-    restart: unless-stopped
+      - NODE_ENV=${NODE_ENV:-production} # Environment mode (defaults to production)
+      - PORT=${PORT:-3000} # Application port
+
+    # Health check to monitor application status
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      # Uses wget to check /health endpoint
+      test: [
+          "CMD", # Run command directly (not in shell)
+          "wget",
+          "--no-verbose", # Suppress output
+          "--tries=1", # Single attempt
+          "--spider", # Don't download, just check
+          "http://localhost:3000/health",
+        ]
+      interval: 30s # Check every 30 seconds
+      timeout: 10s # Wait max 10s for response
+      retries: 3 # Mark unhealthy after 3 failures
+
+    # Connect to monitoring network for service discovery
+    networks:
+      - monitoring
+
+  # =============================================================================
+  # PROMETHEUS SERVICE
+  # =============================================================================
+  # Time-series database for metrics collection and storage
+  # Scrapes metrics from app service at /metrics endpoint
+  prometheus:
+    image: prom/prometheus:v2.48.0 # Official Prometheus image
+    container_name: novi-devops-2025-prometheus
+
+    # Web UI and API access
+    ports:
+      - "9090:9090" # Access at http://localhost:9090
+
+    # Mount configuration and data volumes
+    volumes:
+      # Configuration files (read-only)
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alert_rules.yml:/etc/prometheus/alert_rules.yml:ro
+      # Persistent storage for metrics data
+      - prometheus_data:/prometheus
+
+    # Prometheus startup flags
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml" # Main config
+      - "--storage.tsdb.path=/prometheus" # Data directory
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--web.enable-lifecycle" # Enable reload via API
+
+    networks:
+      - monitoring
+
+  # =============================================================================
+  # GRAFANA SERVICE
+  # =============================================================================
+  # Visualization and dashboarding for Prometheus metrics
+  # Auto-configured via provisioning to connect to Prometheus
+  grafana:
+    image: grafana/grafana:10.2.0 # Official Grafana image
+    container_name: novi-devops-2025-grafana
+
+    # Web UI access (Grafana runs on port 3000 internally)
+    ports:
+      - "3001:3000" # Access at http://localhost:3001
+
+    # Grafana configuration via environment variables
+    environment:
+      # Security settings
+      - GF_SECURITY_ADMIN_USER=admin # Default username
+      - GF_SECURITY_ADMIN_PASSWORD=admin # Default password (change in production!)
+      - GF_USERS_ALLOW_SIGN_UP=false # Disable user registration
+
+      # Dashboard settings
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/basic.json
+      # ↑ Sets "NOVI DevOps 2025 - Application Monitoring" as home dashboard
+
+    # Mount volumes for data persistence and auto-configuration
+    volumes:
+      # Persistent storage for settings and user data
+      - grafana_data:/var/lib/grafana
+
+      # Auto-provisioning: Prometheus datasource + dashboard loader
+      # This automatically configures Grafana on first start
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+
+      # Dashboard JSON files - automatically loaded by provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+
+    # Wait for Prometheus to be ready before starting
+    depends_on:
+      - prometheus
+
+    networks:
+      - monitoring
+
+# =============================================================================
+# PERSISTENT VOLUMES
+# =============================================================================
+# Named volumes for data persistence across container restarts
+volumes:
+  prometheus_data: # Stores Prometheus time-series metrics data
+  grafana_data: # Stores Grafana dashboards, users, and settings
+
+# =============================================================================
+# NETWORKS
+# =============================================================================
+# Custom bridge network for service-to-service communication
+networks:
+  monitoring:
+    driver: bridge # Default Docker bridge network
+    # All services can communicate using service names as hostnames:
+    # - app → http://app:3000
+    # - prometheus → http://prometheus:9090
+    # - grafana → http://grafana:3000

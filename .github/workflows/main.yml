@@ -1,137 +1,441 @@
+# =============================================================================
+# CI/CD PIPELINE - NOVI DEVOPS 2025
+# =============================================================================
+# Automates: testing, building, security scanning, and deployment
+# =============================================================================
+
 name: CI/CD Pipeline
 
+# Trigger conditions:
+# - Push to main or develop branches (direct commits)
+# - Pull requests targeting main (includes develop → main)
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop] # Run on pushes to main and develop
   pull_request:
-    branches: [main, develop]
+    branches: [main] # Run on PRs to main (covers develop branch changes)
+    types: [opened, synchronize, reopened]
+
+# Concurrency control: Cancel outdated workflow runs to save CI minutes
+# Example: Push commit A (starts workflow), then push commit B
+# → Commit A's workflow is cancelled automatically
+# Groups by workflow + ref, so PR runs and push runs are separate groups
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Global environment variables used across all jobs
+env:
+  NODE_VERSION: "22" # Centralized Node.js version for consistency
+  REGISTRY: ghcr.io # GitHub Container Registry
+  IMAGE_NAME: ${{ github.repository }} # Image name matches repository name
+
+# Default permissions: Read-only for all jobs
+# Individual jobs can escalate permissions as needed
+permissions:
+  contents: read
 
 jobs:
-  build:
+  # ===========================================
+  # CODE QUALITY CHECKS (Run in parallel)
+  # ===========================================
+
+  lint:
+    name: Lint Code
     runs-on: ubuntu-latest
+    timeout-minutes: 10 # Prevent runaway jobs (default is 360 minutes)
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # Checkout the repository code
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      # Setup Node.js with npm cache to speed up dependency installation
+      - name: Setup Node.js with cache
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm" # Cache node_modules for faster runs (requires package-lock.json)
+          cache-dependency-path: "package-lock.json"
 
+      # Install dependencies using clean install (respects package-lock.json exactly)
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Build TypeScript
-        run: npm run build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: |
-            dist/
-            node_modules/
-          retention-days: 1
+      # Run ESLint to check code quality and style
+      - name: Run linting
+        run: npm run lint
 
   test:
+    name: Run Tests
     runs-on: ubuntu-latest
-    needs: build
+    timeout-minutes: 15 # Tests should complete within 15 minutes
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js with cache
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-          path: .
-
+      # Run Jest test suite with coverage
       - name: Run tests with coverage
         run: npm run test:coverage
 
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v4
+      # Upload test coverage report as artifact (available even if tests fail)
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        if: always() # Run even if previous steps fail
         with:
-          file: ./coverage/lcov.info
-          flags: unittests
-          fail_ci_if_error: false
+          name: coverage-report
+          path: coverage/
+          if-no-files-found: warn # Warn but don't fail if coverage is missing
 
-  docker:
+  security-audit:
+    name: Security Audit
     runs-on: ubuntu-latest
-    needs: test
+    timeout-minutes: 10 # Audit should complete quickly
+    # Runs in parallel with lint and test jobs for efficiency
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: "package-lock.json"
 
-      - name: Build Docker image
-        run: docker build -t novi-status-api:${{ github.sha }} -t novi-status-api:latest .
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Test Docker image
-        run: |
-          docker run -d -p 3000:3000 --name test-container novi-status-api:latest
-          sleep 10
-          curl -f http://localhost:3000/health || exit 1
-          curl -f http://localhost:3000/status || exit 1
-          docker stop test-container
-          docker rm test-container
+      # Check for known vulnerabilities in dependencies
+      - name: Run npm audit
+        run: npm audit --audit-level=high # Only report high/critical vulnerabilities
+        continue-on-error: true # Report issues but don't fail the build
 
-      - name: Save Docker image
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: docker save novi-status-api:latest -o novi-status-api.tar
+      # Generate detailed JSON report for analysis
+      - name: Save audit report
+        run: npm audit --json > npm-audit.json || true
 
-      - name: Upload Docker image artifact
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      # Upload audit report as artifact for review
+      - name: Upload audit report
         uses: actions/upload-artifact@v4
         with:
-          name: docker-image
-          path: novi-status-api.tar
-          retention-days: 7
+          name: npm-audit-report
+          path: npm-audit.json
 
-  deploy:
+  # ===========================================
+  # DEPENDENCY REVIEW (Pull Requests Only)
+  # ===========================================
+
+  dependency-review:
+    name: Dependency Review
     runs-on: ubuntu-latest
-    needs: docker
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.event_name == 'pull_request' # Only run on PRs
+    timeout-minutes: 5
+
+    # Required permission to read dependency graph
+    permissions:
+      contents: read
+      pull-requests: write # To comment on PRs
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
+      # Scans PR for risky dependency changes (malicious packages, vulnerabilities)
+      - name: Review dependencies
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high # Fail PR if high/critical vulnerabilities found
+          comment-summary-in-pr: always # Post results as PR comment
+
+  # ===========================================
+  # BUILD & PUSH DOCKER IMAGE
+  # ===========================================
+
+  build:
+    name: Build & Push Image
+    runs-on: ubuntu-latest
+    timeout-minutes: 20 # Docker builds should complete within 20 minutes
+    needs: [lint, test, security-audit] # Wait for all quality checks to pass
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+
+    # Required permissions to push to GitHub Container Registry
+    permissions:
+      contents: read # Read repository contents
+      packages: write # Write to GitHub Packages
+      id-token: write # Required for provenance and SBOM signing
+
+    # Export image tag for use in downstream jobs
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Set up Docker Buildx for advanced build features and caching
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Docker Hub
+      # Authenticate to GitHub Container Registry (only on push, not PRs)
+      - name: Log in to Container Registry
+        if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }} # Automatically uses GitHub username
+          password: ${{ secrets.GITHUB_TOKEN }} # Auto-generated token with write access
 
-      - name: Build and push Docker image
+      # Generate Docker image tags and labels based on git metadata
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=                  # Tag with commit SHA (e.g., abc1234)
+            type=ref,event=branch             # Tag with branch name (e.g., main)
+
+      # Build Docker image with layer caching for faster builds
+      - name: Build and push
+        id: build
         uses: docker/build-push-action@v5
         with:
-          context: .
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/novi-status-api:latest
-            ${{ secrets.DOCKER_USERNAME }}/novi-status-api:${{ github.sha }}
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/novi-status-api:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/novi-status-api:buildcache,mode=max
+          context: . # Build from repository root
+          push: ${{ github.event_name == 'push' }} # Only push on actual commits, not PRs
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha # Restore cache from GitHub Actions cache
+          cache-to: type=gha,mode=max # Save all layers to cache
+          # Security: Build provenance and SBOM for supply chain verification
+          # These are automatically attached to the image manifest
+          provenance: true
+          sbom: true # Generate Software Bill of Materials (SPDX format)
+          # SBOM and provenance attestations are automatically pushed to the registry
+          # View them at: ghcr.io with `docker buildx imagetools inspect`
 
-      - name: Deploy notification
+  # ===========================================
+  # CONTAINER SECURITY SCAN
+  # ===========================================
+
+  container-scan:
+    name: Scan Container
+    runs-on: ubuntu-latest
+    timeout-minutes: 15 # Vulnerability scans should be fast
+    needs: build # Run after image is built
+    if: github.event_name == 'push' # Only scan on actual commits
+
+    # Permission to upload security results
+    permissions:
+      contents: read
+      security-events: write
+      packages: read # Need permission to pull from GHCR
+
+    steps:
+      # Checkout code for context
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Login to pull the image from GHCR
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Scan Docker image for known vulnerabilities using Trivy
+      # Use branch tag which is more reliable than SHA
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          # Use branch name tag (e.g., develop, main) which is always pushed
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          format: "sarif" # Output in SARIF format for GitHub
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH" # Only report critical and high severity issues
+        continue-on-error: true # Don't fail build on vulnerabilities
+
+      # Upload scan results to GitHub Security tab
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v4
+        if: always() && hashFiles('trivy-results.sarif') != '' # Only upload if file exists
+        with:
+          sarif_file: "trivy-results.sarif"
+        continue-on-error: true
+
+  # ===========================================
+  # DEPLOYMENT STAGES
+  # ===========================================
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [build, container-scan] # Wait for build and security scan
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+
+    # GitHub Environment with protection rules and secrets
+    environment:
+      name: staging
+      url: https://novi-devops-2025-staging.onrender.com # Environment URL for easy access
+
+    steps:
+      # Deploy to staging environment (develop branch only)
+      - name: Deploy to Render Staging
         run: |
-          echo "✅ Deployment completed successfully!"
-          echo "📦 Image: ${{ secrets.DOCKER_USERNAME }}/novi-status-api:${{ github.sha }}"
-          echo "🔗 Tagged as: latest"
+          echo "🚀 Deploying to STAGING environment..."
+          echo "Image: ${{ needs.build.outputs.image-tag }}"
+          echo "Digest: ${{ needs.build.outputs.image-digest }}"
+
+          # Trigger Render deployment via webhook
+          # Add STAGING_DEPLOY_HOOK to repository secrets:
+          # Settings → Secrets → Actions → New repository secret
+          if [ -n "${{ secrets.STAGING_DEPLOY_HOOK }}" ]; then
+            curl -X POST "${{ secrets.STAGING_DEPLOY_HOOK }}" \
+              -H "Content-Type: application/json" \
+              -d '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+            echo "✅ Deployment triggered successfully"
+          else
+            echo "⚠️  STAGING_DEPLOY_HOOK not configured. Skipping deployment."
+            echo "📝 Configure webhook in: Settings → Secrets → STAGING_DEPLOY_HOOK"
+          fi
+
+      # Wait for deployment to be live (simple health check)
+      - name: Verify deployment
+        run: |
+          echo "⏳ Waiting for deployment to be live..."
+          sleep 30 # Give Render time to deploy
+
+          # Check health endpoint (retry up to 5 times)
+          for i in {1..5}; do
+            if curl -f -s https://novi-devops-2025-staging.onrender.com/health > /dev/null; then
+              echo "✅ Staging environment is healthy!"
+              exit 0
+            fi
+            echo "Attempt $i/5 failed, retrying in 10s..."
+            sleep 10
+          done
+
+          echo "⚠️  Health check failed after 5 attempts"
+          exit 1
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [build, container-scan] # Wait for build and security scan
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    # GitHub Environment with protection rules (can require manual approval)
+    # Configure in: Settings → Environments → production → Deployment protection rules
+    environment:
+      name: production
+      url: https://novi-devops-2025-prod.onrender.com # Live production URL
+
+    steps:
+      # Deploy to production environment (main branch only)
+      - name: Deploy to Render Production
+        id: deploy
+        run: |
+          echo "🚀 Deploying to PRODUCTION environment..."
+          echo "Image: ${{ needs.build.outputs.image-tag }}"
+          echo "Digest: ${{ needs.build.outputs.image-digest }}"
+          echo "Commit: ${{ github.sha }}"
+
+          # Trigger Render deployment via webhook
+          # Get webhook from: Render Dashboard → Service → Settings → Deploy Hook
+          # Add to: GitHub Settings → Secrets → RENDER_DEPLOY_HOOK
+          if [ -n "${{ secrets.RENDER_DEPLOY_HOOK }}" ]; then
+            RESPONSE=$(curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}" \
+              -H "Content-Type: application/json" \
+              -d '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}')
+            echo "✅ Deployment triggered successfully"
+            echo "Response: $RESPONSE"
+          else
+            echo "❌ RENDER_DEPLOY_HOOK not configured!"
+            echo "📝 Add webhook URL to: Settings → Secrets → RENDER_DEPLOY_HOOK"
+            exit 1
+          fi
+
+      # Wait for Render to complete deployment
+      - name: Wait for deployment
+        run: |
+          echo "⏳ Waiting for Render to deploy (this may take 2-5 minutes)..."
+          sleep 60 # Initial wait for build to start
+
+      # Smoke tests: Verify critical endpoints are working
+      - name: Run smoke tests
+        run: |
+          echo "🧪 Running smoke tests against production..."
+          BASE_URL="https://novi-devops-2025-prod.onrender.com"
+
+          # Test 1: Health endpoint
+          echo "Testing /health endpoint..."
+          for i in {1..10}; do
+            if curl -f -s "$BASE_URL/health" | grep -q "ok"; then
+              echo "✅ Health check passed"
+              break
+            fi
+            if [ $i -eq 10 ]; then
+              echo "❌ Health check failed after 10 attempts"
+              exit 1
+            fi
+            echo "Attempt $i/10 failed, retrying in 15s..."
+            sleep 15
+          done
+
+          # Test 2: Info endpoint
+          echo "Testing /api/info endpoint..."
+          if curl -f -s "$BASE_URL/api/info" | grep -q "version"; then
+            echo "✅ Info endpoint working"
+          else
+            echo "❌ Info endpoint failed"
+            exit 1
+          fi
+
+          # Test 3: Items API
+          echo "Testing /api/items endpoint..."
+          if curl -f -s "$BASE_URL/api/items" > /dev/null; then
+            echo "✅ Items API accessible"
+          else
+            echo "❌ Items API failed"
+            exit 1
+          fi
+
+          echo "🎉 All smoke tests passed!"
+
+      # Create deployment record for audit trail and rollback capability
+      - name: Record deployment
+        if: always()
+        run: |
+          echo "=========================================="
+          echo "📦 DEPLOYMENT SUMMARY"
+          echo "=========================================="
+          echo "Status: ${{ job.status }}"
+          echo "Environment: production"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Author: ${{ github.actor }}"
+          echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "Image: ${{ needs.build.outputs.image-tag }}"
+          echo "Digest: ${{ needs.build.outputs.image-digest }}"
+          echo "URL: https://novi-devops-2025-prod.onrender.com"
+          echo "=========================================="
+
+      # Optional: Send notification to Slack/Discord/Email
+      # Uncomment and configure webhook in secrets
+      # - name: Notify team
+      #   if: always()
+      #   run: |
+      #     STATUS_EMOJI="${{ job.status == 'success' && '✅' || '❌' }}"
+      #     MESSAGE="$STATUS_EMOJI Production deployment ${{ job.status }}\nCommit: ${{ github.sha }}\nAuthor: ${{ github.actor }}"
+      #     curl -X POST "${{ secrets.SLACK_WEBHOOK }}" \
+      #       -H "Content-Type: application/json" \
+      #       -d "{\"text\": \"$MESSAGE\"}"

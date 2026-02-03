@@ -1,0 +1,99 @@
+# =============================================================================
+# RENDER.COM DEPLOYMENT CONFIGURATION (Infrastructure as Code)
+# =============================================================================
+# This file defines your deployment configuration as code.
+# Render automatically detects and uses this file from your repository.
+#
+# Documentation: https://render.com/docs/infrastructure-as-code
+# Blueprint Spec: https://render.com/docs/blueprint-spec
+#
+# VALIDATION:
+#   1. Push to GitHub - Render validates syntax automatically
+#   2. Check Render Dashboard for any errors
+#   3. Use Render CLI: render blueprint validate
+# =============================================================================
+
+services:
+  # =============================================================================
+  # STAGING SERVICE - Testing Environment
+  # =============================================================================
+  - type: web
+    name: novi-devops-2025-staging      # Staging service
+    runtime: docker
+
+    # Source Repository Configuration
+    repo: https://github.com/tarektarho/novi-devops-2025
+    branch: develop                     # Deploy from develop branch
+
+    # Deployment Settings
+    plan: free
+    region: frankfurt
+    autoDeploy: true                    # Auto-deploy on push to develop
+
+    # Docker Configuration
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./
+
+
+    # Environment Variables for Staging
+    envVars:
+      - key: NODE_ENV
+        value: staging                  # Staging environment
+
+      - key: BUILD_TIME
+        sync: false
+
+    # Docker builds don't use buildCommand - it's handled by Dockerfile
+    # buildCommand: echo "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> .env
+    numInstances: 1
+
+  # =============================================================================
+  # PRODUCTION SERVICE - Live Environment
+  # =============================================================================
+  - type: web                           # Service type: web, worker, cron, etc.
+    name: novi-devops-2025-prod         # Unique service name in Render
+    runtime: docker                     # Use Dockerfile for build
+
+    # Source Repository Configuration
+    repo: https://github.com/tarektarho/novi-devops-2025  # Full GitHub URL (https:// required)
+    branch: main                        # Branch to deploy from
+
+    # Deployment Settings
+    plan: free                          # Plan: free, starter, standard, pro, etc.
+    region: frankfurt                   # EU region for GDPR compliance (oregon, frankfurt, singapore)
+    autoDeploy: true                    # Auto-deploy on git push
+
+    # Docker Configuration
+    dockerfilePath: ./Dockerfile        # Path to Dockerfile (default: ./Dockerfile)
+    dockerContext: ./                   # Build context (default: repository root)
+
+    healthCheckPath: /health            # Must return 200 OK when healthy
+
+    # Environment Variables
+    envVars:
+      # Application Environment
+      - key: NODE_ENV
+        value: production               # Run in production mode
+
+      # PORT is automatically set by Render (usually 10000)
+      # Your app MUST listen on process.env.PORT
+
+
+      # Build Timestamp (set at deploy time)
+      # NOTE: DEPLOYED_AT should be set via build command, not generateValue
+      # generateValue is for secrets/random values, not timestamps
+      - key: BUILD_TIME
+        sync: false                     # Don't sync from dashboard (set during build)
+
+    # Docker builds don't use buildCommand - the build is handled by Dockerfile
+    # buildCommand: echo "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> .env
+
+    # Number of instances (free plan = 1)
+    numInstances: 1
+
+    # Scaling configuration (not available on free plan)
+    # scaling:
+    #   minInstances: 1
+    #   maxInstances: 3
+    #   targetMemoryPercent: 80
+    #   targetCPUPercent: 80
