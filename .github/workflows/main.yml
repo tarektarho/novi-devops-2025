@@ -194,14 +194,32 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }} # Auto-generated token with write access
 
       # Generate Docker image tags and labels based on git metadata
+      # Tagging Strategy:
+      # - latest: Only on main branch (production-ready)
+      # - branch name: For environment tracking (main, develop)
+      # - commit SHA: For precise version identification
+      # - semver: For release versioning (when tags are pushed)
+      # - PR number: For pull request builds
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=sha,prefix=                  # Tag with commit SHA (e.g., abc1234)
-            type=ref,event=branch             # Tag with branch name (e.g., main)
+            # Tag with 'latest' only on main branch
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            # Tag with branch name (e.g., main, develop)
+            type=ref,event=branch
+            # Tag with PR number (e.g., pr-42)
+            type=ref,event=pr
+            # Tag with short commit SHA (e.g., abc1234)
+            type=sha,prefix=
+            # Semantic versioning from git tags (e.g., v1.0.0 → 1.0.0, 1.0, 1)
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }}
+            # Timestamp for unique builds (e.g., 20260204-143052)
+            type=raw,value={{date 'YYYYMMDD-HHmmss'}},enable=${{ github.ref == 'refs/heads/main' }}
 
       # Build Docker image with layer caching for faster builds
       - name: Build and push
