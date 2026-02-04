@@ -132,6 +132,46 @@ Only Commit C runs (saves ~20 CI minutes)
 - Generates SBOM (Software Bill of Materials)
 - Creates build attestations for supply chain security
 
+#### Docker Image Tagging Strategy
+
+The workflow uses a comprehensive tagging strategy for traceability and versioning:
+
+| Tag Type | Example | When Applied | Purpose |
+|----------|---------|--------------|---------|
+| `latest` | `latest` | main branch only | Production-ready image |
+| `branch` | `main`, `develop` | All branches | Environment tracking |
+| `pr` | `pr-42` | Pull requests | PR build identification |
+| `sha` | `abc1234` | All builds | Precise commit tracking |
+| `semver` | `1.0.0`, `1.0`, `1` | Git tags (v1.0.0) | Release versioning |
+| `timestamp` | `20260204-143052` | main branch only | Unique build identification |
+
+**Using Semantic Versioning:**
+```bash
+# Create a release tag
+git tag v1.0.0
+git push origin v1.0.0
+
+# This generates these Docker tags:
+# - ghcr.io/tarektarho/novi-devops-2025:1.0.0
+# - ghcr.io/tarektarho/novi-devops-2025:1.0
+# - ghcr.io/tarektarho/novi-devops-2025:1
+```
+
+**Pulling Specific Versions:**
+```bash
+# Latest production image
+docker pull ghcr.io/tarektarho/novi-devops-2025:latest
+
+# Specific commit
+docker pull ghcr.io/tarektarho/novi-devops-2025:abc1234
+
+# Specific release
+docker pull ghcr.io/tarektarho/novi-devops-2025:1.0.0
+
+# Development branch
+docker pull ghcr.io/tarektarho/novi-devops-2025:develop
+```
+
 ### Security Scan (15min timeout)
 - Uses Trivy to scan Docker image
 - Checks for CVEs in dependencies and OS packages
