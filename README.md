@@ -2,42 +2,42 @@
 
 Node.js TypeScript REST API with Object-Oriented Programming, comprehensive monitoring, testing, and containerization. Built with SOLID principles, Repository Pattern, and CI/CD automation.
 
-## ✨ Key Features
+## Key Features
 
 ### Architecture & Design
-- 🏗️ **Object-Oriented Architecture** - SOLID principles with clean code practices
-- 🔄 **Repository Pattern** - Abstracted data access layer ready for database migration
-- 💉 **Dependency Injection** - Loosely coupled components for easy testing
-- 🎯 **Design Patterns** - Singleton, Template, Factory, and Repository patterns
-- 📝 **Full TypeScript** - Strict type checking with isolated modules
+- **Object-Oriented Architecture** - SOLID principles with clean code practices
+- **Repository Pattern** - Abstracted data access layer ready for database migration
+- **Dependency Injection** - Loosely coupled components for easy testing
+- **Design Patterns** - Singleton, Template, Factory, and Repository patterns
+- **Full TypeScript** - Strict type checking with isolated modules
 
 ### API & Functionality
-- 🚀 **RESTful CRUD API** - Complete items management with validation
-- ❤️ **Health Monitoring** - Production-ready health check endpoints
-- 📊 **Prometheus Metrics** - Built-in metrics collection and export
-- 📈 **Grafana Integration** - Real-time monitoring and visualization
-- 🔍 **Request Logging** - Structured logging with development mode
+- **RESTful CRUD API** - Complete items management with validation
+- **Health Monitoring** - Production-ready health check endpoints
+- **Prometheus Metrics** - Built-in metrics collection and export
+- **Grafana Integration** - Real-time monitoring and visualization
+- **Request Logging** - Structured logging with development mode
 
 ### Quality & Testing
-- ✅ **95.85% Test Coverage** - 207 comprehensive tests
-- 🧪 **Jest Testing** - Unit and integration tests
-- 🔒 **Security Scanning** - Automated vulnerability scanning with Trivy
-- 📦 **Linting** - Code quality enforcement
+- **95.85% Test Coverage** - 207 comprehensive tests
+- **Jest Testing** - Unit and integration tests
+- **Security Scanning** - Automated vulnerability scanning with Trivy
+- **Linting** - Code quality enforcement
 
 ### DevOps & Deployment
-- 🐳 **Docker** - Multi-stage builds for optimized images
-- 🎼 **Docker Compose** - One-command deployment with Prometheus + Grafana
-- ⚙️ **CI/CD Pipeline** - Automated testing, building, and deployment
-- 🔐 **Container Security** - SARIF security reports in GitHub
+- **Docker** - Multi-stage builds for optimized images
+- **Docker Compose** - One-command deployment with Prometheus + Grafana
+- **CI/CD Pipeline** - Automated testing, building, and deployment
+- **Container Security** - SARIF security reports in GitHub
 
-## 📋 Prerequisites
+## Prerequisites
 
 - **Node.js** 22.x or higher
 - **Docker** 20.x or higher
 - **Docker Compose** v2.x
 - **npm** 9.x or higher
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Local Development
 
@@ -79,7 +79,7 @@ npm run compose:down
 - Prometheus: `http://localhost:9090`
 - Grafana: `http://localhost:3001` (admin/admin)
 
-## 📚 Available Scripts
+## Available Scripts
 
 | Script | Description |
 |--------|-------------|
@@ -98,7 +98,7 @@ npm run compose:down
 | `npm run compose:down` | Stop all Docker Compose services |
 | `npm run compose:logs` | Stream logs from all services |
 
-## 🔌 API Endpoints
+## API Endpoints
 
 ### Health & Info
 
@@ -377,7 +377,7 @@ GitHub Actions workflow triggered on push to `main`/`develop` branches and pull 
 
 See [.github/workflows/main.yml](.github/workflows/main.yml) for complete workflow configuration.
 
-## ⚙️ Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -511,7 +511,7 @@ npm run compose:up
 docker-compose ps
 ```
 
-## 🔄 Migration to Real Database
+## Migration to Real Database
 
 The application uses Repository Pattern, making database migration straightforward:
 
@@ -537,13 +537,13 @@ const controller = new ItemsController(repository);
 
 No changes needed to business logic or API endpoints!
 
-## 📚 Documentation
+## Documentation
 
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** - Detailed architecture and design patterns
 - **[TESTING.md](TESTING.md)** - Testing strategy and coverage details
 - **[.github/workflows/main.yml](.github/workflows/main.yml)** - CI/CD pipeline configuration
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please follow these steps:
 
@@ -574,11 +574,11 @@ git commit -m "feat: add my feature"
 git push origin feature/my-feature
 ```
 
-## 📝 License
+## License
 
 This project is licensed under the **ISC License** - see the [LICENSE](LICENSE) file for details.
 
-## 👥 Authors & Contact
+## Authors & Contact
 
 **Repository:** [novi-devops-2025](https://github.com/tarektarho/novi-devops-2025)
 **Issues:** [Report a bug or request a feature](https://github.com/tarektarho/novi-devops-2025/issues)
@@ -595,7 +595,7 @@ Built with modern tools and best practices:
 - **Docker** - Containerization platform
 - **GitHub Actions** - CI/CD automation
 
-## 📝 TODO
+## TODO
 
 Future improvements and enhancements:
 
@@ -607,13 +607,4 @@ Future improvements and enhancements:
 
 ---
 
-**Built with ❤️ using TypeScript, Express, Docker, and GitHub Actions**
-
-<p align="center">
-  <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" />
-  <img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" />
-  <img src="https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white" />
-  <img src="https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white" />
-  <img src="https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white" />
-  <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white" />
-</p>
+Built with TypeScript, Express, Docker, and GitHub Actions.
