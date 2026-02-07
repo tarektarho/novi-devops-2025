@@ -1,7 +1,7 @@
 {
     "name": "novi-devops-2025",
-    "version": "1.0.2",
-    "description": "Simple Node.js TypeScript API with status endpoint",
+    "version": "1.0.3",
+    "description": "Node.js TypeScript API with status endpoint",
     "main": "dist/index.js",
     "scripts": {
         "clean": "rm -rf node_modules dist coverage",
