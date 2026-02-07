@@ -1,6 +1,6 @@
 {
     "name": "novi-devops-2025",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Simple Node.js TypeScript API with status endpoint",
     "main": "dist/index.js",
     "scripts": {
@@ -14,13 +14,13 @@
         "test:watch": "jest --watch",
         "test:coverage": "jest --coverage",
         "ci": "npm run clean && npm ci && npm run build && npm run docker:build",
-        "docker:build": "docker build -t novi-devops-2025:latest .",
-        "docker:run": "docker run -d -p 3000:3000 --name novi-devops-2025 novi-devops-2025:latest",
-        "docker:stop": "docker stop novi-devops-2025 && docker rm novi-devops-2025",
-        "docker:test": "docker run --rm -p 3000:3000 --name test-container novi-devops-2025:latest & sleep 10 && curl -f http://localhost:3000/health && curl -f http://localhost:3000/status && docker stop test-container",
-        "compose:up": "docker-compose up -d",
-        "compose:down": "docker-compose down",
-        "compose:logs": "docker-compose logs -f"
+        "docker:build": "docker build -t novi-devops-2025-app:latest .",
+        "docker:run": "docker run -d -p 3000:3000 --name novi-devops-2025-app novi-devops-2025-app:latest",
+        "docker:stop": "docker stop novi-devops-2025-app && docker rm novi-devops-2025-app",
+        "docker:test": "docker run --rm -p 3000:3000 --name test-container novi-devops-2025-app:latest & sleep 10 && curl -f http://localhost:3000/health && curl -f http://localhost:3000/api/info && docker stop test-container",
+        "compose:up": "docker compose up -d",
+        "compose:down": "docker compose down",
+        "compose:logs": "docker compose logs -f"
     },
     "keywords": [
         "api",

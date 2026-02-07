@@ -198,8 +198,7 @@ describe('API Endpoints', () => {
   });
 
   describe('GET /metrics', () => {
-    it.skip('should return Prometheus metrics', async () => {
-      // Skipping due to singleton metrics service initialization in test environment
+    it('should return Prometheus metrics', async () => {
       const response = await request(app).get('/metrics');
 
       expect(response.status).toBe(200);

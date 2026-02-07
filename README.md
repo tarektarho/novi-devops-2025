@@ -582,7 +582,6 @@ This project is licensed under the **ISC License** - see the [LICENSE](LICENSE) 
 
 **Repository:** [novi-devops-2025](https://github.com/tarektarho/novi-devops-2025)
 **Issues:** [Report a bug or request a feature](https://github.com/tarektarho/novi-devops-2025/issues)
-**Discussions:** [Join the discussion](https://github.com/tarektarho/novi-devops-2025/discussions)
 
 ## Acknowledgments
 
