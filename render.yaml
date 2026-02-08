@@ -36,7 +36,6 @@ services:
 
     healthCheckPath: /health           # Health check endpoint
 
-
     # Environment Variables for Staging
     envVars:
       - key: NODE_ENV
