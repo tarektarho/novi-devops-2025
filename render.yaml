@@ -34,6 +34,8 @@ services:
     dockerfilePath: ./Dockerfile
     dockerContext: ./
 
+    healthCheckPath: /health           # Health check endpoint
+
 
     # Environment Variables for Staging
     envVars:
