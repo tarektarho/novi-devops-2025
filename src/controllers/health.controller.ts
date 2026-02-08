@@ -52,7 +52,7 @@ export class HealthController extends BaseController {
    */
   public root = (req: Request, res: Response): Response => {
     return this.ok(res, {
-      message: 'Welcome to Items Management Service!!',
+      message: 'Welcome to Items Management Service!',
       version: this.config.get('appVersion'),
       environment: this.config.get('nodeEnv')
     });

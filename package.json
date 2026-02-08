@@ -1,6 +1,6 @@
 {
     "name": "novi-devops-2025",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "description": "Node.js TypeScript API with status endpoint",
     "main": "dist/index.js",
     "scripts": {
@@ -16,6 +16,7 @@
         "ci": "npm run clean && npm ci && npm run build && npm run docker:build",
         "docker:build": "docker build -t novi-devops-2025-app:latest .",
         "docker:run": "docker run -d -p 3000:3000 --name novi-devops-2025-app novi-devops-2025-app:latest",
+        "docker:up": " npm run docker:build && docker-compose up -d",
         "docker:stop": "docker stop novi-devops-2025-app && docker rm novi-devops-2025-app",
         "docker:test": "docker run --rm -p 3000:3000 --name test-container novi-devops-2025-app:latest & sleep 10 && curl -f http://localhost:3000/health && curl -f http://localhost:3000/api/info && docker stop test-container",
         "compose:up": "docker compose up -d",
