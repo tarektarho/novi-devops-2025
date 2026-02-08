@@ -1,6 +1,6 @@
-# NOVI DevOps 2025 - REST API
+# NOVI DevOps 2025 - CRUD Item Management Service
 
-Node.js TypeScript REST API with Object-Oriented Programming, comprehensive monitoring, testing, and containerization. Built with SOLID principles, Repository Pattern, and CI/CD automation.
+A CRUD Item Management Service built with Node.js and TypeScript. It follows SOLID principles and the Repository Pattern, and comes with Docker support, monitoring, testing, and a CI/CD pipeline out of the box.
 
 ## Key Features
 
