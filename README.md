@@ -461,6 +461,9 @@ Pre-configured to visualize:
 - System resource usage
 - API endpoint performance
 
+<img width="1423" height="839" alt="Screenshot 2026-02-16 at 20 10 58" src="https://github.com/user-attachments/assets/4c2ab90a-3d72-40d6-9dd4-b4dece199948" />
+
+
 ## Troubleshooting
 
 ### Common Issues
